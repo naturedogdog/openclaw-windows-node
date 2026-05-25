@@ -5,6 +5,9 @@ on:
   push:
     tags: [ 'v*' ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -39,17 +42,17 @@ jobs:
 
     - name: Build Installer (Inno Setup)
       run: |
-        & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion="${{ steps.gitversion.outputs.semVer }}" installer.iss        
+        & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion="${{ steps.gitversion.outputs.semVer }}" /DMyAppArch=x64 /Dpublish=publish installer.iss        
 
     - name: Upload Setup EXE
       uses: actions/upload-artifact@v7
       with:
         name: OpenClawTray-Setup-x64
-        path: installer-output/OpenClawTray-Setup-x64.exe
+        path: Output/OpenClawTray-Setup-x64.exe
 
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v2
       with:
-        files: installer-output/OpenClawTray-Setup-x64.exe
+        files: Output/OpenClawTray-Setup-x64.exe
         generate_release_notes: true
